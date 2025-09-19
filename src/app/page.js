@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Sidebar from "../../components/Sidebar";
+import Feed from "../../components/Feed";
 
 export default function Home() {
 return (
@@ -9,6 +10,7 @@ return (
             <Sidebar/>
             
             {/* Feed Section */}
+            <Feed/>
             
             {/* Widgets Section */}
 
