@@ -6,7 +6,7 @@ import {BellIcon, BookmarkIcon, ClipboardIcon, DotsCircleHorizontalIcon, DotsHor
 
 export default function Sidebar() {
   return (
-    <div className='hidden sm:flex flex-col p-2 xl:items-start fixed h-full'>
+    <div className='hidden sm:flex flex-col p-2 xl:items-start fixed h-full xl:ml-24'>
           {/* Logo Section */}
           <div className='hover:brightness-125 rounded-full xl:px-1'>
               <Image
