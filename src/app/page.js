@@ -1,13 +1,12 @@
-import Image from "next/image";
-import Sidebar from "../../components/Sidebar";
-import Feed from "../../components/Feed";
-import Widgets from "../../components/Widgets";
-import { Newsreader } from "next/font/google";
+import Sidebar from "../../components/Sidebar"
+import Feed from "../../components/Feed"
+import Widgets from "../../components/Widgets"
 
-
-export default async function Home({ newsResult }) {
+export default async function Home({ newsResult, randomUsersResult }) {
     
-    newsResult = await fetch('https://saurav.tech/NewsAPI/top-headlines/category/business/us.json').then((res) => res.json()); 
+    newsResult = await fetch('https://saurav.tech/NewsAPI/top-headlines/category/business/us.json').then((res) => res.json());
+
+    randomUsersResult = await fetch('https://randomuser.me/api/?results=30&inc=name,login,picture').then((res) => res.json());
 
 return (
     <div>
@@ -19,10 +18,10 @@ return (
             <Feed/>
             
             {/* Widgets Section */}
-            <Widgets articles={newsResult.articles} />
+            <Widgets articles={newsResult.articles} results={ randomUsersResult.results} />
 
             {/* Modal Section */}
         </main>        
     </div>
-  );
+    );
 }
