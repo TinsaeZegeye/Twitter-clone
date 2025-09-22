@@ -11,6 +11,8 @@
   "dependencies": {
     "@heroicons/react": "^1.0.6",
     "cloudinary": "^2.7.0",
+    "firebase": "^12.3.0",
+    "formidable": "^3.5.4",
     "heroicons": "^1.0.6",
     "next": "15.5.3",
     "next-auth": "^4.24.11",
