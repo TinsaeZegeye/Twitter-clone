@@ -1,11 +1,16 @@
 import { ChartBarIcon, ChatIcon, DotsHorizontalIcon, HeartIcon, ShareIcon, TrashIcon } from '@heroicons/react/outline'
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
 
-export default function Post({post}) {
+dayjs.extend(relativeTime)
+
+export default function Post({ post }) {
+    const timestamp = post.data().timestamp?.toDate();
   return (
     <div className='flex p-3 cursor-pointer border-b border-gray-200'>
           {/* Main div for post section */}
 
-          <img className='h-11 w-11 rounded-full mr-4' src={post.userImg} alt="User-Profile-Image" />
+          <img className='h-11 w-11 rounded-full mr-4' src={post.data().userImg} alt="User-Profile-Image" />
           
           <div >
               {/* Right section */}
@@ -15,18 +20,20 @@ export default function Post({post}) {
 
                     <div className='flex space-x-2 items-center whitespace-nowrap'>
                         {/* User Info part */}
-                        <h4 className='font-bold text-[15px] sm:text-[16px] hover:underline'>{post.name}</h4>
-                        <span className='text-sm sm:text-[15px]'>@{post.username} -</span>
-                        <span className='text-sm sm:text-[15px] hover:underline'>{ post.timestamp}</span>
+                        <h4 className='font-bold text-[15px] sm:text-[16px] hover:underline'>{post.data().name}</h4>
+                        <span className='text-sm sm:text-[15px]'>@{post.data().username} -</span>
+            <span className='text-sm sm:text-[15px] hover:underline'>
+              {timestamp ? dayjs(timestamp).fromNow() : ""}
+            </span>
                     </div>
                         <DotsHorizontalIcon className='h-10 hoverEffect w-10 hover:bg-sky-100 hover:text-sky-500 p-2' />
             </div>      
               
               {/* Post Text */}
-              <p className='text-gray-800 text-[15px] sm:text-[16px] mb-2'>{post.text}</p>
+              <p className='text-gray-800 text-[15px] sm:text-[16px] mb-2'>{post.data().text}</p>
               
               {/* Post image */}
-              <img className='rounded-2xl mr-2 aspect-square' src={post.postImg} alt="Post image" />
+              <img className='rounded-2xl mr-2 aspect-square' src={post.data().imageUrl} alt="Post image" />
 
               <div className='flex justify-between text-gray-500 p-2'>
                   {/* Post Reaction icons */}

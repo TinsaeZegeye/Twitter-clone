@@ -18,7 +18,7 @@ const handler = NextAuth({
     callbacks: {
             async jwt({ token, user }) {
                 if (user) {
-                token.username = user.name?.split(" ").join("").toLowerCase();
+                token.username = user.name?.split(" ").join("").toLocaleLowerCase();
                 token.uid = user.sub;
                 }
                 return token;

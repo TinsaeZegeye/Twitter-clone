@@ -53,7 +53,7 @@ export default function Input() {
         await addDoc(collection(db, 'Posts'), {
             userID: session.user.uid, 
             name: session.user.name, 
-            username: session.user.name, 
+            username: session.user.username, 
             userImg: session.user.image, 
             text: input, 
             imageUrl: data.secure_url, 
@@ -66,6 +66,7 @@ export default function Input() {
         setLoading(false);
 
   }
+ 
       
   return (
     <div className='flex border-b border-gray-200 p-3 space-x-3'>
@@ -84,7 +85,7 @@ export default function Input() {
             {selectedFile && (
               <>
                 <div className='flex justify-center relative mt-2 pb-3'>
-                   <XIcon onClick={()=> setSelectedFile(null)} className={` ${loading && 'hidden'} h-7 cursor-pointer text-gray-800 absolute shadow-md shadow-whiter rounded-full right-10 top-2 hover:scale-105 transition-transform duration-200`}/>               
+                   <XIcon onClick={()=> setSelectedFile(null)} className={` ${loading && 'hidden'} h-7 cursor-pointer text-gray-800 absolute shadow-md shadow-white border p-1 rounded-full right-10 top-2 hover:scale-105 transition-transform duration-200`}/>               
                     <img src={imagePreview} width='250' className={`${loading && 'animate-pulse'} rounded-2xl object-cover`} />
                 </div>
               </>
