@@ -1,10 +1,16 @@
+'use client'
+
 import Image from 'next/image'
 import React from 'react'
 import SidebarMenuItems from './SidebarMenuItems'
 import { HomeIcon } from '@heroicons/react/solid'
-import {BellIcon, BookmarkIcon, ClipboardIcon, DotsCircleHorizontalIcon, DotsHorizontalIcon, HashtagIcon, InboxIcon, UserIcon} from '@heroicons/react/outline'
+import { BellIcon, BookmarkIcon, ClipboardIcon, DotsCircleHorizontalIcon, DotsHorizontalIcon, HashtagIcon, InboxIcon, UserIcon } from '@heroicons/react/outline'
+import { useSession, signIn, signOut } from 'next-auth/react'
 
 export default function Sidebar() {
+
+    const { data: session } = useSession();    
+    
   return (
     <div className='hidden sm:flex flex-col p-2 xl:items-start fixed h-full xl:ml-24'>
           {/* Logo Section */}
@@ -21,27 +27,39 @@ export default function Sidebar() {
           {/* Menu Section */}
           <div className='mt-4 mb-2.5 xl:items-start'>
               <SidebarMenuItems text='Home' Icon={ HomeIcon} active />
-              <SidebarMenuItems text='Explore' Icon={ HashtagIcon} />
-              <SidebarMenuItems text='Notifications' Icon={ BellIcon} />
-              <SidebarMenuItems text='Messages' Icon={ InboxIcon} />
-              <SidebarMenuItems text='Bookmarks' Icon={ BookmarkIcon} />
-              <SidebarMenuItems text='Lits' Icon={ ClipboardIcon} />
-              <SidebarMenuItems text='Profile' Icon={ UserIcon} />
-              <SidebarMenuItems text='More' Icon={ DotsCircleHorizontalIcon} />
+              <SidebarMenuItems text='Explore' Icon={HashtagIcon} />
+
+              {session && (
+                  <>
+                      <SidebarMenuItems text='Notifications' Icon={ BellIcon} />
+                      <SidebarMenuItems text='Messages' Icon={ InboxIcon} />
+                      <SidebarMenuItems text='Bookmarks' Icon={ BookmarkIcon} />
+                      <SidebarMenuItems text='Lits' Icon={ ClipboardIcon} />
+                      <SidebarMenuItems text='Profile' Icon={ UserIcon} />
+                      <SidebarMenuItems text='More' Icon={DotsCircleHorizontalIcon} />  
+                    </>
+                  )}
           </div>
 
           {/* Button  */}
-          <button className='bg-blue-400 text-white rounded-full w-56 h-12 font-bold shadow-md hover:brightness-90 text-lg hidden xl:inline'>Tweet</button>
+          {session ? (
+              <>                  
+                <button className='bg-blue-400 text-white rounded-full w-56 h-12 font-bold shadow-md hover:brightness-90 text-lg hidden xl:inline cursor-pointer'>Tweet</button>
 
-          {/* MiniProfile */}
-          <div className='hoverEffect text-gray-700 flex items-center justify-center xl:justify-start mt-auto'>
-              <img className='cursor-pointer h-15 w-15 rounded-full xl:mr-2' src="/userpro.jpeg" alt="User-Profile-Image" />
-              <div className='leading-5 hidden xl:inline'>
-                  <h4 className='font-bold'>Tinsae Zegeye</h4>
-                  <p>@YenYoki</p>
-              </div>
-              <DotsHorizontalIcon className='cursor-pointer h-5 xl:ml-8 hidden xl:inline'/>
-          </div>
+                {/* MiniProfile */}
+                <div className='hoverEffect text-gray-700 flex items-center justify-center xl:justify-start mt-auto'>
+                    <img className='cursor-pointer h-15 w-15 rounded-full xl:mr-2' src={session.user.image} alt="User-Profile-Image" />
+                    <div className='leading-5 hidden xl:inline'>
+                        <h4 className='font-bold'>{session.user.name}</h4>
+                        <p>@{session.user.username}</p>
+                    </div>
+                    <DotsHorizontalIcon className='cursor-pointer h-5 xl:ml-8 hidden xl:inline'/>
+                  </div>
+                </>
+              
+              ):(
+                <button onClick={()=>signIn()} className='bg-blue-400 text-white rounded-full w-36 h-12 font-bold shadow-md hover:brightness-90 text-lg hidden xl:inline cursor-pointer'>Sign in</button>
+              )}
     </div>
   )
 }
