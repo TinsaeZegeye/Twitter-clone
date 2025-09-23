@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@heroicons/react": "^1.0.6",
+    "@reduxjs/toolkit": "^2.9.0",
     "cloudinary": "^2.7.0",
     "dayjs": "^1.11.18",
     "firebase": "^12.3.0",
@@ -20,7 +21,9 @@
     "next": "15.5.3",
     "next-auth": "^4.24.11",
     "react": "19.1.0",
-    "react-dom": "19.1.0"
+    "react-dom": "19.1.0",
+    "react-redux": "^9.2.0",
+    "recoil": "^0.7.7"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

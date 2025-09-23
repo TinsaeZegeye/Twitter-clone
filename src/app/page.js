@@ -1,6 +1,7 @@
 import Sidebar from "../../components/Sidebar"
 import Feed from "../../components/Feed"
 import Widgets from "../../components/Widgets"
+import CommentModal from "../../components/CommentModal";
 
 export default async function Home({ newsResult, randomUsersResult }) {
     
@@ -21,6 +22,7 @@ return (
             <Widgets articles={newsResult.articles} results={ randomUsersResult.results} />
 
             {/* Modal Section */}
+            <CommentModal/>
         </main>        
     </div>
     );
