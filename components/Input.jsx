@@ -76,7 +76,7 @@ export default function Input() {
           <div className='w-full divide-y divide-gray-200'>
               <div>
               <textarea
-                className='focus:outline-none w-full border-none text-lg placeholder-gray-700 tracking-wide min-h-[50px] text-gray-700' rows='2' placeholder='What is happening?'
+                className='focus:outline-none w-full border-none text-lg placeholder-gray-700 tracking-wide min-h-[50px] max-h-[200px] text-gray-700' rows='2' placeholder='What is happening?'
                 value={input}
                 onChange={(e)=> setInput(e.target.value)}
               />

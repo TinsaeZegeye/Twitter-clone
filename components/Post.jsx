@@ -9,7 +9,8 @@ import { useEffect, useState } from 'react';
 import { db } from '../lib/firebase';
 import { HeartIcon as HeartIconFilled } from '@heroicons/react/solid';
 import { useDispatch } from 'react-redux';
-import { toggleModal } from '../store/modalSlice';
+import { openModal, toggleModal } from '../store/modalSlice';
+import { Poltawski_Nowy } from 'next/font/google';
 
 
 dayjs.extend(relativeTime)
@@ -19,7 +20,7 @@ export default function Post({ post }) {
     const [likes, setLikes] = useState([]);
     const [hasLiked, setHasLiked] = useState(false);
     const { data: session } = useSession();
-    const dispatch = useDispatch()
+    const dispatch = useDispatch();
 
     useEffect(() => {
         const unSubscribe = onSnapshot(
@@ -49,6 +50,19 @@ export default function Post({ post }) {
         if (window.confirm('Are you sure you want to delete the post?')) {
             await deleteDoc(doc(db, 'Posts', post.id))
         }
+    }
+
+    function commentOnPost() {
+        const plainPost = {
+            id: post?.id, 
+            name: post?.data().name, 
+            username: post?.data().username,
+            timestamp: post?.data().timestamp ? post.data().timestamp.toDate().toISOString() : null, 
+            text: post?.data().text, 
+            userImg: post?.data().userImg, 
+
+        }
+        dispatch(openModal(plainPost));
     }
   
   return (
@@ -82,7 +96,7 @@ export default function Post({ post }) {
 
               <div className='flex justify-between text-gray-500 p-2'>
                   {/* Post Reaction icons */}
-                  <ChatIcon onClick={()=> dispatch(toggleModal())} className='h-9 w-9 hoverEffect p-2 hover:text-sky-500 hover:bg-sky-100' />
+                  <ChatIcon onClick={commentOnPost} className='h-9 w-9 hoverEffect p-2 hover:text-sky-500 hover:bg-sky-100' />
                   
                   {session?.user.uid === post.data().userID && (
                       <TrashIcon onClick={deletePost} className='h-9 w-9 hoverEffect p-2 hover:text-red-600 hover:bg-red-100' />
