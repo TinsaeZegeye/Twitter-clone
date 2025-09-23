@@ -47,7 +47,7 @@ export default function Sidebar() {
                 <button className='bg-blue-400 text-white rounded-full w-56 h-12 font-bold shadow-md hover:brightness-90 text-lg hidden xl:inline cursor-pointer'>Tweet</button>
 
                 {/* MiniProfile */}
-                <div className='hoverEffect text-gray-700 flex items-center justify-center xl:justify-start mt-auto'>
+                <div onClick={signOut} className='hoverEffect text-gray-700 flex items-center justify-center xl:justify-start mt-auto'>
                     <img className='cursor-pointer h-15 w-15 rounded-full xl:mr-2' src={session.user.image} alt="User-Profile-Image" />
                     <div className='leading-5 hidden xl:inline'>
                         <h4 className='font-bold'>{session.user.name}</h4>
