@@ -37,6 +37,12 @@ export default function Post({ post }) {
             signIn();
         }
     }
+
+    async function deletePost() {
+        if (window.confirm('Are you sure you want to delete the post?')) {
+            await deleteDoc(doc(db, 'Posts', post.id))
+        }
+    }
   
   return (
     <div className='flex p-3 cursor-pointer border-b border-gray-200'>
@@ -69,8 +75,11 @@ export default function Post({ post }) {
 
               <div className='flex justify-between text-gray-500 p-2'>
                   {/* Post Reaction icons */}
-                  <ChatIcon className='h-9 w-9 hoverEffect p-2 hover:text-sky-500 hover:bg-sky-100'/>
-                  <TrashIcon className='h-9 w-9 hoverEffect p-2 hover:text-red-600 hover:bg-red-100' />
+                  <ChatIcon className='h-9 w-9 hoverEffect p-2 hover:text-sky-500 hover:bg-sky-100' />
+                  
+                  {session?.user.uid === post.data().userID && (
+                      <TrashIcon onClick={deletePost} className='h-9 w-9 hoverEffect p-2 hover:text-red-600 hover:bg-red-100' />
+                  )}
                   
                   <div className='flex items-center'>
                         {hasLiked ? (

@@ -5,6 +5,7 @@ import React, { useRef, useState } from 'react'
 import { useSession } from 'next-auth/react'
 import { db } from '../lib/firebase'
 import { addDoc, collection, serverTimestamp } from 'firebase/firestore'
+import { CLIENT_PUBLIC_FILES_PATH } from 'next/dist/shared/lib/constants'
 
 export default function Input() {
   const { data: session } = useSession();
@@ -49,7 +50,6 @@ export default function Input() {
         });
 
         const data = await res.json(); 
-        
         await addDoc(collection(db, 'Posts'), {
             userID: session.user.uid, 
             name: session.user.name, 
@@ -57,6 +57,7 @@ export default function Input() {
             userImg: session.user.image, 
             text: input, 
             imageUrl: data.secure_url, 
+            publicId: data.public_id,
             timestamp: serverTimestamp(), 
         })
 
@@ -65,9 +66,8 @@ export default function Input() {
         setImagePreview(null);
         setLoading(false);
 
-  }
- 
-      
+    }
+    
   return (
     <div className='flex border-b border-gray-200 p-3 space-x-3'>
       {session && (
