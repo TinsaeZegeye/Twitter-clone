@@ -7,7 +7,8 @@ import { ArrowLeftIcon } from "@heroicons/react/outline";
 import Post from "../../../components/Post";
 import { useEffect, useState } from "react";
 import { db } from "../../../lib/firebase";
-import { onSnapshot } from "firebase/firestore";
+import { collection, onSnapshot, orderBy, query } from "firebase/firestore";
+import Comment from "../../../components/Comment";
 
 export default async function Home({ newsResult, randomUsersResult }) {
     
@@ -18,10 +19,16 @@ export default async function Home({ newsResult, randomUsersResult }) {
     const router = useRouter();
     const { id } = router.query;
     const [post, setPost] = useState()
+    const [comments, setComments] = useState();
 
     useEffect(() => {
         onSnapshot(doc(db, 'Posts', id), (snapshot)=>setPost(snapshot))
     }, [db, id])
+
+    useEffect(() => {
+        onSnapshot(query(collection(db, 'Posts', id, 'comments'), orderBy('timestamp', 'desc'), (snapshot)=>setComments(snapshot.docs)))
+    }, [])
+
 return (
     <div>
         <main className="flex min-h-screen mx-auto">
@@ -37,6 +44,14 @@ return (
                     <h2 className='font-bold text-lg sm:text-xl cursor-pointer flex-grow'>Tweet</h2>
                 </div>
                 <Post id={id} post={post} />
+
+                {comments.length > 0 && (
+                    <div>
+                        {comments.map((comment) => {
+                            <Comment key={comment.id} id={comment.id} comment={comment.data()} />
+                        })}
+                    </div>
+                )}
             </div>
             
             {/* Widgets Section */}
