@@ -45,13 +45,23 @@ return (
                 </div>
                 <Post id={id} post={post} />
 
-                {comments.length > 0 && (
-                    <div>
-                        {comments.map((comment) => {
-                            <Comment key={comment.id} commentId={comment.id} originalPostId={id} comment={comment.data()} />
-                        })}
-                    </div>
-                )}
+                <AnimatePresence>
+                    {comments.length > 0 && (
+                        <motion.div
+                            key={comment.id}
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            transition={{ duration: 1 }}
+                        >
+                            <div>
+                                {comments.map((comment) => {
+                                    <Comment commentId={comment.id} originalPostId={id} comment={comment.data()} />
+                                })}
+                            </div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
             </div>
             
             {/* Widgets Section */}
