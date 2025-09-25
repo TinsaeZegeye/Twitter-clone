@@ -9,6 +9,7 @@ import { useEffect, useState } from "react";
 import { db } from "../../../lib/firebase";
 import { collection, onSnapshot, orderBy, query } from "firebase/firestore";
 import Comment from "../../../components/Comment";
+import { motion, AnimatePresence } from 'motion/react';
 
 export default async function Home({ newsResult, randomUsersResult }) {
     
