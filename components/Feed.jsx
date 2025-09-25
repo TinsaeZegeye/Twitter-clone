@@ -7,9 +7,10 @@ import { useEffect, useState } from 'react'
 import { collection, onSnapshot, query, orderBy } from 'firebase/firestore'
 import { db } from '../lib/firebase'
 import {motion, AnimatePresence} from 'motion/react'
+import { useRouter } from 'next/router'
 
 export default function Feed() {
-    const [posts, setPosts] = useState([]);
+  const [posts, setPosts] = useState([]);
     useEffect(() => {
         onSnapshot(query(collection(db, 'Posts'), orderBy('timestamp', 'desc')), (snapshot)=>{
           setPosts(snapshot.docs)
@@ -33,7 +34,7 @@ export default function Feed() {
             exit={{ opacity: 0 }}
             transition={{ duration: 1 }}
           >
-            <Post post={post} />
+            <Post id={post.id} post={post} />
           </motion.div>
         ))}
       </AnimatePresence>
