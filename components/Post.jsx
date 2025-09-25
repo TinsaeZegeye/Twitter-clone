@@ -3,7 +3,7 @@
 import { ChartBarIcon, ChatIcon, DotsHorizontalIcon, HeartIcon, ShareIcon, TrashIcon } from '@heroicons/react/outline'
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
-import { collection, deleteDoc, doc, onSnapshot, setDoc } from 'firebase/firestore';
+import { collection, deleteDoc, doc, onSnapshot, setDoc, snapshotEqual } from 'firebase/firestore';
 import { signIn, useSession } from 'next-auth/react';
 import { useEffect, useState } from 'react';
 import { db } from '../lib/firebase';
@@ -18,6 +18,7 @@ dayjs.extend(relativeTime)
 export default function Post({ post }) {
   const timestamp = post.data().timestamp?.toDate();
     const [likes, setLikes] = useState([]);
+    const [comments, setComments] = useState([]);
     const [hasLiked, setHasLiked] = useState(false);
     const { data: session } = useSession();
     const dispatch = useDispatch();
@@ -26,6 +27,10 @@ export default function Post({ post }) {
         const unSubscribe = onSnapshot(
             collection(db, 'Posts', post.id, 'likes'), (snapshot)=>setLikes(snapshot.docs)
         )
+    }, [db])
+
+    useEffect(() => {
+        const unSubscribe = onSnapshot(collection(db, 'Posts', post.id, 'comments'), (snapshot)=> setComments(snapshot.docs))
     }, [db])
 
     useEffect(() => {
@@ -81,42 +86,49 @@ export default function Post({ post }) {
                         {/* User Info part */}
                         <h4 className='font-bold text-[15px] sm:text-[16px] hover:underline'>{post.data().name}</h4>
                         <span className='text-sm sm:text-[15px]'>@{post.data().username} -</span>
-            <span className='text-sm sm:text-[15px] hover:underline'>
-              {timestamp ? dayjs(timestamp).fromNow() : ""}
-            </span>
+                        <span className='text-sm sm:text-[15px] hover:underline'>
+                        {timestamp ? dayjs(timestamp).fromNow() : ""}
+                        </span>
                     </div>
                         <DotsHorizontalIcon className='h-10 hoverEffect w-10 hover:bg-sky-100 hover:text-sky-500 p-2' />
-            </div>      
+                    </div>      
               
-              {/* Post Text */}
-              <p className='text-gray-800 text-[15px] sm:text-[16px] mb-2'>{post.data().text}</p>
-              
-              {/* Post image */}
-              <img className='rounded-2xl mr-2 aspect-square' src={post.data().imageUrl} alt="Post image" />
+                    {/* Post Text */}
+                    <p className='text-gray-800 text-[15px] sm:text-[16px] mb-2'>{post.data().text}</p>
+                    
+                    {/* Post image */}
+                    <img className='rounded-2xl mr-2 aspect-square' src={post.data().imageUrl} alt="Post image" />
 
-              <div className='flex justify-between text-gray-500 p-2'>
+                    <div className='flex justify-between text-gray-500 p-2'>
                   {/* Post Reaction icons */}
-                  <ChatIcon onClick={commentOnPost} className='h-9 w-9 hoverEffect p-2 hover:text-sky-500 hover:bg-sky-100' />
-                  
-                  {session?.user.uid === post.data().userID && (
-                      <TrashIcon onClick={deletePost} className='h-9 w-9 hoverEffect p-2 hover:text-red-600 hover:bg-red-100' />
-                  )}
-                  
-                  <div className='flex items-center'>
-                        {hasLiked ? (
-                            <HeartIconFilled onClick={likePost} className='h-9 w-9 hoverEffect p-2 text-red-600 hover:bg-red-100'/>
-                        ) : (
-                            <HeartIcon onClick={likePost} className='h-9 w-9 hoverEffect p-2 hover:text-red-600 hover:bg-red-100'/>     
-                      )}
-                      {
-                          likes.length > 0 && <span className={`${hasLiked && 'text-red-500'} text-sm`}>{likes.length}</span>
-                      }
+                        <div className='flex items-center select-none'>
+                            <ChatIcon onClick={commentOnPost} className='h-9 w-9 hoverEffect p-2 hover:text-sky-500 hover:bg-sky-100' />
+                            {
+                                comments.length > 0 && (
+                                    <span className='text-sm'>{ comments.length}</span>
+                                )
+                            }
+                        </div>
+                        
+                        {session?.user.uid === post.data().userID && (
+                            <TrashIcon onClick={deletePost} className='h-9 w-9 hoverEffect p-2 hover:text-red-600 hover:bg-red-100' />
+                        )}
+                        
+                        <div className='flex items-center'>
+                                {hasLiked ? (
+                                    <HeartIconFilled onClick={likePost} className='h-9 w-9 hoverEffect p-2 text-red-600 hover:bg-red-100'/>
+                                ) : (
+                                    <HeartIcon onClick={likePost} className='h-9 w-9 hoverEffect p-2 hover:text-red-600 hover:bg-red-100'/>     
+                            )}
+                            {
+                                likes.length > 0 && <span className={`${hasLiked && 'text-red-500'} text-sm`}>{likes.length}</span>
+                            }
+                        </div>
+                        <ShareIcon className='h-9 w-9 hoverEffect p-2 hover:text-sky-500 hover:bg-sky-100'/>
+                        <ChartBarIcon className='h-9 w-9 hoverEffect p-2 hover:text-sky-500 hover:bg-sky-100'/>
+                        
+                    </div>
                 </div>
-                  <ShareIcon className='h-9 w-9 hoverEffect p-2 hover:text-sky-500 hover:bg-sky-100'/>
-                  <ChartBarIcon className='h-9 w-9 hoverEffect p-2 hover:text-sky-500 hover:bg-sky-100'/>
-                  
-              </div>
-          </div>
     </div>
   )
 }

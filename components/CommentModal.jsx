@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import ReactModal from 'react-modal';
 import { useDispatch, useSelector } from 'react-redux'
 import { closeModal, toggleModal } from '../store/modalSlice';
@@ -8,20 +8,35 @@ import { EmojiHappyIcon, PhotographIcon, XIcon } from '@heroicons/react/outline'
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { useSession } from 'next-auth/react';
+import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
+import { db } from '../lib/firebase';
+import { useRouter } from 'next/compat/router';
 
 dayjs.extend(relativeTime)
 
 
 
 export default function CommentModal() {
-    const { isOpen, post } = useSelector((state) => state.modal)
-    const [open, setOpen] = useState(false)
+    const { isOpen, post } = useSelector((state) => state.modal);
+    const [open, setOpen] = useState(false);
     const dispatch = useDispatch();
     const [input, setInput] = useState();
     const { data: session } = useSession();
+    const router = useRouter();
 
-    function sendComment() {
-        
+    async function sendComment() {
+        await addDoc(collection(db, 'Posts', post.id, 'comments'), {
+            comment: input, 
+            name: post?.name,
+            username: post?.username, 
+            userImg: post?.userImg, 
+            timestamp: serverTimestamp(), 
+        })
+
+        setOpen(false);
+        setInput(false);
+
+        router.push(`posts/${post.id}`);
     }
 
     return (
