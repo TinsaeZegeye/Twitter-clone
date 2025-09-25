@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import ReactModal from 'react-modal';
 import { useDispatch, useSelector } from 'react-redux'
 import { closeModal, toggleModal } from '../store/modalSlice';
-import { EmojiHappyIcon, PhotographIcon, XIcon } from '@heroicons/react/outline';
+import { EmojiHappyIcon, PhotographIcon, UserGroupIcon, XIcon } from '@heroicons/react/outline';
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { useSession } from 'next-auth/react';
@@ -31,6 +31,7 @@ export default function CommentModal() {
             username: post?.username, 
             userImg: post?.userImg, 
             timestamp: serverTimestamp(), 
+            userId: session?.user.uid,
         })
 
         setOpen(false);
