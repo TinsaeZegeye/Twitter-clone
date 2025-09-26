@@ -4,6 +4,8 @@ import React, { useEffect, useState } from "react";
 import { getProviders } from "next-auth/react";
 import SignInButton from "../../../../components/SignInButton";
 
+export const dynamic = "force-dynamic";
+
 export default function Page() {
   const [providers, setProviders] = useState(null);
 
