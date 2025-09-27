@@ -52,44 +52,51 @@ export default function Input() {
     };
 
     const handleUpload = async () => {
-        if (!input || !selectedFile) return;
+        if (!input) return;
         setLoading(true);
+        
+        let imageURL = null;
+        let publicID = null;
 
-        const formData = new FormData();
-        formData.append('upload_preset', 'twitter-clone');
-        formData.append('userId', user?.uid);
-        formData.append('user', user?.name);
-        formData.append('userName', user?.username);
-        formData.append('userImg', user?.image);
-        formData.append('text', input);
-        formData.append('file', selectedFile);
-        formData.append('timestamp', new Date().toISOString());
+        if (selectedFile) {
+            const formData = new FormData();
+            formData.append('upload_preset', 'twitter-clone');
+            formData.append('file', selectedFile)
+    
+            const res = await fetch(
+                `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`,
+                {
+                    method: 'POST',
+                    body: formData,
+                }
+            );
+            const data = await res.json();
+            imageURL = data.secure_url;
+            publicID = data.public_id;
+        }
+     
 
-        const res = await fetch(
-            `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`,
-            {
-                method: 'POST',
-                body: formData,
-            }
-        );
-
-        const data = await res.json();
-        await addDoc(collection(db, 'Posts'), {
+        const postData = {
             userID: user?.uid,
             name: user?.name,
             username: user?.username,
             userImg: user?.userImg,
             text: input,
-            imageUrl: data.secure_url,
-            publicId: data.public_id,
             timestamp: serverTimestamp(),
-        });
+        }
+
+        if (imageURL) {
+            postData.imageUrl = imageURL;
+            postData.publicId = publicId;
+        }
+
+        await addDoc(collection(db, 'Posts'), postData);
 
         setInput('');
         setSelectedFile(null);
         setImagePreview(null);
         setLoading(false);
-    };
+};
 
     return (
         <div className='flex border-b border-gray-200 p-3 space-x-3'>
