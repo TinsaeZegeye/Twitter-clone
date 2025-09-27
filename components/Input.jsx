@@ -1,19 +1,41 @@
 'use client'
 
-import { EmojiHappyIcon, PhotographIcon, XIcon } from '@heroicons/react/outline';
-import React, { useRef, useState } from 'react';
-import { useSession } from 'next-auth/react';
+import {
+    EmojiHappyIcon,
+    PhotographIcon,
+    XIcon
+} from '@heroicons/react/outline';
+import React, { useEffect, useRef, useState } from 'react';
 import { db } from '../lib/firebase';
-import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
+import {
+    addDoc,
+    collection,
+    doc,
+    getDoc,
+    serverTimestamp
+} from 'firebase/firestore';
 import { CLIENT_PUBLIC_FILES_PATH } from 'next/dist/shared/lib/constants';
+import { getAuth, onAuthStateChanged, signOut } from 'firebase/auth';
+import { useRouter } from 'next/navigation';
+import { useDispatch, useSelector } from 'react-redux';
+import { clearUser } from '../store/authSlice';
 
 export default function Input() {
-    const { data: session } = useSession();
+    
     const filePickerRef = useRef(null);
     const [selectedFile, setSelectedFile] = useState(null);
     const [input, setInput] = useState('');
     const [imagePreview, setImagePreview] = useState(null);
     const [loading, setLoading] = useState(false);
+
+    const user = useSelector((state) => state.auth?.user);
+    const dispatch = useDispatch();
+    const auth = getAuth()
+    
+    function onSignOut() {
+        signOut(auth);
+        dispatch(clearUser());
+    }
 
     const addImageToPost = (e) => {
         if (!e.target.files[0]) return;
@@ -35,10 +57,10 @@ export default function Input() {
 
         const formData = new FormData();
         formData.append('upload_preset', 'twitter-clone');
-        formData.append('userId', session.user.uid);
-        formData.append('user', session.user.name);
-        formData.append('userName', session.user.username);
-        formData.append('userImg', session.user.image);
+        formData.append('userId', user?.uid);
+        formData.append('user', user?.name);
+        formData.append('userName', user?.username);
+        formData.append('userImg', user?.image);
         formData.append('text', input);
         formData.append('file', selectedFile);
         formData.append('timestamp', new Date().toISOString());
@@ -53,10 +75,10 @@ export default function Input() {
 
         const data = await res.json();
         await addDoc(collection(db, 'Posts'), {
-            userID: session.user.uid,
-            name: session.user.name,
-            username: session.user.username,
-            userImg: session.user.image,
+            userID: user?.uid,
+            name: user?.name,
+            username: user?.username,
+            userImg: user?.userImg,
             text: input,
             imageUrl: data.secure_url,
             publicId: data.public_id,
@@ -71,12 +93,13 @@ export default function Input() {
 
     return (
         <div className='flex border-b border-gray-200 p-3 space-x-3'>
-            {session && (
+            {user && (
                 <>
                     <img
                         className='h-11 w-11 rounded-full cursor-pointer hover:brightness-90'
-                        src={session.user.image}
+                        src={user?.userImg}
                         alt='User-Profile-Image'
+                        onClick={onSignOut}
                     />
                     <div className='w-full divide-y divide-gray-200'>
                         <div>

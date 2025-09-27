@@ -21,7 +21,7 @@ import { signIn, useSession } from 'next-auth/react';
 import { useEffect, useState } from 'react';
 import { db } from '../lib/firebase';
 import { HeartIcon as HeartIconFilled } from '@heroicons/react/solid';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { openModal } from '../store/modalSlice';
 import { useRouter } from 'next/navigation';
 
@@ -30,7 +30,7 @@ dayjs.extend(relativeTime);
 export default function Comment({ comment, commentId, originalPostId }) {
   const [likes, setLikes] = useState([]);
   const [hasLiked, setHasLiked] = useState(false);
-  const { data: session } = useSession();
+  const user = useSelector((state) => state.auth?.user);
   const dispatch = useDispatch();
   const router = useRouter();
 
@@ -53,14 +53,14 @@ export default function Comment({ comment, commentId, originalPostId }) {
   // Track if current user liked this comment
   useEffect(() => {
     setHasLiked(
-      likes.findIndex((like) => like.id === session?.user.uid) !== -1
+      likes.findIndex((like) => like.id === user?.uid) !== -1
     );
-  }, [likes, session?.user.uid]);
+  }, [likes, user?.uid]);
 
   // Like / Unlike comment
   async function likeComment() {
-    if (!session) {
-      signIn();
+    if (!user) {
+      router.push('/auth/signin');
       return;
     }
 
@@ -68,12 +68,12 @@ export default function Comment({ comment, commentId, originalPostId }) {
 
     if (hasLiked) {
       await deleteDoc(
-        doc(db, 'Posts', originalPostId, 'comments', commentId, 'likes', session.user.uid)
+        doc(db, 'Posts', originalPostId, 'comments', commentId, 'likes', user?.uid)
       );
     } else {
       await setDoc(
-        doc(db, 'Posts', originalPostId, 'comments', commentId, 'likes', session.user.uid),
-        { username: session.user.username }
+        doc(db, 'Posts', originalPostId, 'comments', commentId, 'likes', user?.uid),
+        { username: user?.username }
       );
     }
   }
@@ -138,7 +138,7 @@ export default function Comment({ comment, commentId, originalPostId }) {
             />
           </div>
 
-          {session?.user.uid === comment?.userId && (
+          {user?.uid === comment?.userId && (
             <TrashIcon
               onClick={deleteComment}
               className="h-9 w-9 hoverEffect p-2 hover:text-red-600 hover:bg-red-100"

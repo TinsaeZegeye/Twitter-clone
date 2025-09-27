@@ -1,15 +1,56 @@
 'use client'
 
 import Image from 'next/image'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import SidebarMenuItems from './SidebarMenuItems'
 import { HomeIcon } from '@heroicons/react/solid'
-import { BellIcon, BookmarkIcon, ClipboardIcon, DotsCircleHorizontalIcon, DotsHorizontalIcon, HashtagIcon, InboxIcon, UserIcon } from '@heroicons/react/outline'
-import { useSession, signIn, signOut } from 'next-auth/react'
+import {
+  BellIcon,
+  BookmarkIcon,
+  ClipboardIcon,
+  DotsCircleHorizontalIcon, 
+  DotsHorizontalIcon, 
+  HashtagIcon,
+  InboxIcon,
+  UserIcon
+} from '@heroicons/react/outline'
+import { getAuth, onAuthStateChanged, signOut } from 'firebase/auth'
+import { db } from '../lib/firebase'
+import { doc, getDoc } from 'firebase/firestore'
+import { useRouter } from 'next/navigation'
+import { useDispatch, useSelector } from 'react-redux'
+import { clearUser, setUser } from '../store/authSlice'
 
 export default function Sidebar() {
 
-    const { data: session } = useSession();    
+    const user = useSelector((state) => state.auth?.user);
+    const dispatch = useDispatch();
+    const auth = getAuth();
+    const router = useRouter();
+
+  useEffect(() => {
+      onAuthStateChanged(auth, (firebaseUser) => {
+          if (firebaseUser) {
+              const fetchData = async () => {
+                  try {
+                      const docRef = doc(db, 'Users', auth.currentUser.providerData[0].uid);
+                      const docSnap = await getDoc(docRef)
+                      if (docSnap.exists()) {
+                          dispatch(setUser(docSnap.data()));
+                      }
+                  } catch (error) {
+                  console.log('Error:', error);
+              }
+          }
+        fetchData();
+      }
+    })
+  }, [auth]);
+    
+  function onSignOut() {
+      signOut(auth);
+      dispatch(clearUser());
+  }
     
   return (
     <div className='hidden sm:flex flex-col p-2 xl:items-start fixed h-full xl:ml-24'>
@@ -29,7 +70,7 @@ export default function Sidebar() {
               <SidebarMenuItems text='Home' Icon={ HomeIcon} active />
               <SidebarMenuItems text='Explore' Icon={HashtagIcon} />
 
-              {session && (
+              {user && (
                   <>
                       <SidebarMenuItems text='Notifications' Icon={ BellIcon} />
                       <SidebarMenuItems text='Messages' Icon={ InboxIcon} />
@@ -42,23 +83,29 @@ export default function Sidebar() {
           </div>
 
           {/* Button  */}
-          {session ? (
+          {user? (
               <>                  
                 <button className='bg-blue-400 text-white rounded-full w-56 h-12 font-bold shadow-md hover:brightness-90 text-lg hidden xl:inline cursor-pointer'>Tweet</button>
 
                 {/* MiniProfile */}
-                <div onClick={signOut} className='hoverEffect text-gray-700 flex items-center justify-center xl:justify-start mt-auto'>
-                    <img className='cursor-pointer h-15 w-15 rounded-full xl:mr-2' src={session.user.image} alt="User-Profile-Image" />
+                <div onClick={onSignOut} className='hoverEffect text-gray-700 flex items-center justify-center xl:justify-start mt-auto'>
+            <Image
+              className='cursor-pointer rounded-full xl:mr-2'
+              width='40'
+              height='40'
+              src={user?.userImg}
+              alt="User-Profile-Image"
+            />
                     <div className='leading-5 hidden xl:inline'>
-                        <h4 className='font-bold'>{session.user.name}</h4>
-                        <p>@{session.user.username}</p>
+                        <h4 className='font-bold'>{user?.name}</h4>
+                        <p>@{user?.username}</p>
                     </div>
                     <DotsHorizontalIcon className='cursor-pointer h-5 xl:ml-8 hidden xl:inline'/>
                   </div>
                 </>
               
               ):(
-                <button onClick={()=>signIn()} className='bg-blue-400 text-white rounded-full w-36 h-12 font-bold shadow-md hover:brightness-90 text-lg hidden xl:inline cursor-pointer'>Sign in</button>
+                <button onClick={()=>router.push('/auth/signin')} className='bg-blue-400 text-white rounded-full w-36 h-12 font-bold shadow-md hover:brightness-90 text-lg hidden xl:inline cursor-pointer'>Sign in</button>
               )}
     </div>
   )

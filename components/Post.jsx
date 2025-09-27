@@ -23,9 +23,10 @@ import { signIn, useSession } from 'next-auth/react';
 import { useEffect, useState } from 'react';
 import { db } from '../lib/firebase';
 import { HeartIcon as HeartIconFilled } from '@heroicons/react/solid';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { openModal } from '../store/modalSlice';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 
 dayjs.extend(relativeTime);
 
@@ -34,7 +35,7 @@ export default function Post({ post, id, isSinglePage }) {
   const [likes, setLikes] = useState([]);
   const [comments, setComments] = useState([]);
   const [hasLiked, setHasLiked] = useState(false);
-  const { data: session } = useSession();
+  const user = useSelector((state) => state.auth?.user);
   const dispatch = useDispatch();
   const router = useRouter();
 
@@ -47,7 +48,7 @@ export default function Post({ post, id, isSinglePage }) {
     );
 
     return () => likesUnsubscribe();
-  }, [id]);
+  }, [id, user]);
 
   useEffect(() => {
     if (!id) return;
@@ -65,22 +66,22 @@ export default function Post({ post, id, isSinglePage }) {
   }, [id]);
 
   useEffect(() => {
-    setHasLiked(likes.findIndex((like) => like.id === session?.user.uid) !== -1);
-  }, [likes, session]);
+    setHasLiked(likes.findIndex((like) => like.id === user?.uid) !== -1);
+  }, [likes, user]);
 
   async function likePost() {
-    if (!session) {
-      signIn();
+    if (!user) {
+      router.push('/auth/signin');
       return;
     }
 
     if (!id) return;
 
     if (hasLiked) {
-      await deleteDoc(doc(db, 'Posts', id, 'likes', session?.user.uid));
+      await deleteDoc(doc(db, 'Posts', id, 'likes', user?.uid));
     } else {
-      await setDoc(doc(db, 'Posts', id, 'likes', session?.user.uid), {
-        username: session?.user.username
+      await setDoc(doc(db, 'Posts', id, 'likes', user?.uid), {
+        username: user?.username
       });
     }
   }
@@ -93,8 +94,8 @@ export default function Post({ post, id, isSinglePage }) {
   }
 
   function commentOnPost() {
-    if (!session) {
-      signIn();
+    if (!user) {
+      router.push('/auth/signin');
       return;
     }
 
@@ -149,9 +150,11 @@ export default function Post({ post, id, isSinglePage }) {
 
         {/* Post image */}
         {post?.data()?.imageUrl && (
-          <img
+          <Image
             onClick={() => router.push(`/posts/${id}`)}
             className="rounded-2xl mr-4 aspect-square "
+            width='400'
+            height='100'
             src={post?.data()?.imageUrl}
             alt="Post image"
           />
@@ -167,7 +170,7 @@ export default function Post({ post, id, isSinglePage }) {
             {!isSinglePage && comments?.length > 0 && <span className="text-sm">{comments.length}</span>}
           </div>
 
-          {session?.user.uid === post?.data()?.userID && (
+          {user?.uid === post?.data()?.userID && (
             <TrashIcon
               onClick={deletePost}
               className="h-9 w-9 hoverEffect p-2 hover:text-red-600 hover:bg-red-100"
