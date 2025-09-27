@@ -115,7 +115,6 @@ export default function Post({ post, id, isSinglePage }) {
 
   return (
     <div className="flex p-3 cursor-pointer border-b border-gray-200">
-      {/* Main div for post section */}
       <img
         className="h-11 w-11 rounded-full mr-4"
         src={post?.data()?.userImg}
@@ -123,11 +122,8 @@ export default function Post({ post, id, isSinglePage }) {
       />
 
       <div>
-        {/* Right section */}
         <div className="flex items-center justify-between">
-          {/* Post header part */}
           <div className="flex space-x-2 items-center whitespace-nowrap">
-            {/* User Info part */}
             <h4 className="font-bold text-[15px] sm:text-[16px] hover:underline">
               {post?.data()?.name}
             </h4>
@@ -140,7 +136,6 @@ export default function Post({ post, id, isSinglePage }) {
           <DotsHorizontalIcon className="h-10 hoverEffect w-10 hover:bg-sky-100 hover:text-sky-500 p-2" />
         </div>
 
-        {/* Post Text */}
         <p
           onClick={() => router.push(`/posts/${id}`)}
           className="text-gray-800 text-[15px] sm:text-[16px] mb-2"
@@ -148,7 +143,6 @@ export default function Post({ post, id, isSinglePage }) {
           {post?.data()?.text}
         </p>
 
-        {/* Post image */}
         {post?.data()?.imageUrl && (
           <Image
             onClick={() => router.push(`/posts/${id}`)}
@@ -160,20 +154,22 @@ export default function Post({ post, id, isSinglePage }) {
           />
         )}
 
-        <div className="flex justify-between text-gray-500 p-2">
-          {/* Post Reaction icons */}
+        {/* Fixed icon container */}
+        <div className="flex flex-wrap justify-between text-gray-500 p-2 gap-2">
           <div className="flex items-center select-none">
             <ChatIcon
-              onClick={()=>commentOnPost()}
-              className="h-9 w-9 hoverEffect p-2 hover:text-sky-500 hover:bg-sky-100"
+              onClick={() => commentOnPost()}
+              className="h-8 w-8 sm:h-9 sm:w-9 hoverEffect p-2 hover:text-sky-500 hover:bg-sky-100"
             />
-            {!isSinglePage && comments?.length > 0 && <span className="text-sm">{comments.length}</span>}
+            {!isSinglePage && comments?.length > 0 && (
+              <span className="text-sm">{comments.length}</span>
+            )}
           </div>
 
           {user?.uid === post?.data()?.userID && (
             <TrashIcon
               onClick={deletePost}
-              className="h-9 w-9 hoverEffect p-2 hover:text-red-600 hover:bg-red-100"
+              className="h-8 w-8 sm:h-9 sm:w-9 hoverEffect p-2 hover:text-red-600 hover:bg-red-100"
             />
           )}
 
@@ -181,12 +177,12 @@ export default function Post({ post, id, isSinglePage }) {
             {hasLiked ? (
               <HeartIconFilled
                 onClick={likePost}
-                className="h-9 w-9 hoverEffect p-2 text-red-600 hover:bg-red-100"
+                className="h-8 w-8 sm:h-9 sm:w-9 hoverEffect p-2 text-red-600 hover:bg-red-100"
               />
             ) : (
               <HeartIcon
                 onClick={likePost}
-                className="h-9 w-9 hoverEffect p-2 hover:text-red-600 hover:bg-red-100"
+                className="h-8 w-8 sm:h-9 sm:w-9 hoverEffect p-2 hover:text-red-600 hover:bg-red-100"
               />
             )}
             {likes?.length > 0 && (
@@ -196,8 +192,8 @@ export default function Post({ post, id, isSinglePage }) {
             )}
           </div>
 
-          <ShareIcon className="h-9 w-9 hoverEffect p-2 hover:text-sky-500 hover:bg-sky-100" />
-          <ChartBarIcon className="h-9 w-9 hoverEffect p-2 hover:text-sky-500 hover:bg-sky-100" />
+          <ShareIcon className="h-8 w-8 sm:h-9 sm:w-9 hoverEffect p-2 hover:text-sky-500 hover:bg-sky-100" />
+          <ChartBarIcon className="h-8 w-8 sm:h-9 sm:w-9 hoverEffect p-2 hover:text-sky-500 hover:bg-sky-100" />
         </div>
       </div>
     </div>
