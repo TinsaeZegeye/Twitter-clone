@@ -114,7 +114,7 @@ export default function Post({ post, id, isSinglePage }) {
   }
 
   return (
-    <div className="flex p-3 cursor-pointer border-b border-gray-200">
+    <div className="flex p-3 ml-1 cursor-pointer border-b border-gray-200">
       <img
         className="h-11 w-11 rounded-full mr-4"
         src={post?.data()?.userImg}
